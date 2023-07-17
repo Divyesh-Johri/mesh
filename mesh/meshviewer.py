@@ -46,7 +46,7 @@ import time
 import traceback
 
 import numpy as np
-from OpenGL import GL, GLU, GLUT
+# from OpenGL import GL, GLU, GLUT
 from OpenGL.arrays.vbo import VBO
 from PIL import Image
 import zmq
@@ -96,6 +96,7 @@ def _run_self(args, stdin=None, stdout=None, stderr=None):
 
 def _test_for_opengl():
     try:
+        from OpenGL import GL, GLU, GLUT
         # from OpenGL.GLUT import glutInit
         GLUT.glutInit()
     except Exception as e:
@@ -307,6 +308,7 @@ class MeshViewerSingle:
         self.autorecenter = True
 
     def get_dimensions(self):
+        from OpenGL import GL, GLU, GLUT
         d = {}
         d['window_width'] = GLUT.glutGet(GLUT.GLUT_WINDOW_WIDTH)
         d['window_height'] = GLUT.glutGet(GLUT.GLUT_WINDOW_HEIGHT)
@@ -317,7 +319,7 @@ class MeshViewerSingle:
         return d
 
     def on_draw(self, transform, want_camera=False):
-
+        from OpenGL import GL, GLU, GLUT
         d = self.get_dimensions()
 
         GL.glViewport(
@@ -369,6 +371,7 @@ class MeshViewerSingle:
 
     @staticmethod
     def set_shaders(m):
+        from OpenGL import GL, GLU, GLUT
         VERTEX_SHADER = GL.shaders.compileShader("""void main() {
                     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
                 }""", GL.GL_VERTEX_SHADER)
@@ -379,6 +382,7 @@ class MeshViewerSingle:
 
     @staticmethod
     def set_texture(m):
+        from OpenGL import GL, GLU, GLUT
         texture_data = np.array(m.texture_image, dtype='int8')
         m.textureID = GL.glGenTextures(1)
         GL.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1)
@@ -389,7 +393,7 @@ class MeshViewerSingle:
 
     @staticmethod
     def draw_mesh(m, lighting_on):
-
+        from OpenGL import GL, GLU, GLUT
         # Supply vertices
         GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
         m.vbo['v'].bind()
@@ -514,6 +518,7 @@ class MeshViewerSingle:
 
     @staticmethod
     def draw_lines(ls):
+        from OpenGL import GL, GLU, GLUT
         GL.glDisableClientState(GL.GL_NORMAL_ARRAY)
         GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
         GL.glLineWidth(3.0)
@@ -537,6 +542,7 @@ class MeshViewerSingle:
                         center=[0.0, 0.0, 0.0],
                         recenter=False,
                         want_camera=False):
+        from OpenGL import GL, GLU, GLUT
 
         # measure the bounding box of all our primitives, so that we can
         # recenter them in our field of view
@@ -972,6 +978,7 @@ class MeshViewerRemote:
 
         .. note:: Requires the Pillow package to be installed.
         """
+        from OpenGL import GL, GLU, GLUT
         self.on_draw()
         time.sleep(wait_time)
 
@@ -987,6 +994,7 @@ class MeshViewerRemote:
         image.save(path)
 
     def activate(self, width, height):
+        from OpenGL import GL, GLU, GLUT
         GLUT.glutInit(['mesh_viewer'])
         GLUT.glutInitDisplayMode(GLUT.GLUT_RGBA | GLUT.GLUT_DOUBLE | GLUT.GLUT_ALPHA | GLUT.GLUT_DEPTH)
         GLUT.glutInitWindowSize(width, height)
@@ -1010,6 +1018,7 @@ class MeshViewerRemote:
             Glut calls this function (when mouse button is down)
             and pases the mouse cursor postion in window coords as the mouse moves.
         """
+        from OpenGL import GL, GLU, GLUT
         from .geometry.rodrigues import rodrigues
         if (self.isdragging):
             mouse_pt = Point2fT(cursor_x, cursor_y)
@@ -1041,7 +1050,7 @@ class MeshViewerRemote:
             Glut calls this function when a mouse button is
             clicked or released.
         """
-
+        from OpenGL import GL, GLU, GLUT
         self.isdragging = False
 
         if (button == GLUT.GLUT_LEFT_BUTTON and button_state == GLUT.GLUT_UP):
@@ -1074,7 +1083,7 @@ class MeshViewerRemote:
         GLUT.glutPostRedisplay()
 
     def send_mouseclick_to_caller(self, cursor_x, cursor_y, button='right'):
-
+        from OpenGL import GL, GLU, GLUT
         client = zmq.Context.instance().socket(zmq.PUSH)
         client.connect('{}://{}:{}'.format(ZMQ_TRANSPORT, ZMQ_HOST, self.mouseclick_port))
         cameras = self.on_draw(want_cameras=True)
@@ -1121,6 +1130,7 @@ class MeshViewerRemote:
 
     def on_draw(self, want_cameras=False):
         # sys.stderr.write('fps: %.2e\n' % (1. / (time.time() - self.tm_for_fps)))
+        from OpenGL import GL, GLU, GLUT
         self.tm_for_fps = time.time()
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         cameras = []
@@ -1148,6 +1158,7 @@ class MeshViewerRemote:
         })
 
     def handle_request(self, request):
+        from OpenGL import GL, GLU, GLUT
         label = request['label']
         obj = request['obj']
         w = request['which_window']
@@ -1203,6 +1214,7 @@ class MeshViewerRemote:
         return True  # handled the request string
 
     def checkQueue(self, unused_timer_id):
+        from OpenGL import GL, GLU, GLUT
         GLUT.glutTimerFunc(20, self.checkQueue, 0)
 
         try:
@@ -1241,7 +1253,7 @@ class MeshViewerRemote:
 
         We call this right after our OpenGL window is created.
         """
-
+        from OpenGL import GL, GLU, GLUT
         GL.glClearColor(0.0, 0.0, 0.0, 1.0)  # This Will Clear The Background Color To Black
         GL.glClearDepth(1.0)  # Enables Clearing Of The Depth Buffer
         GL.glDepthFunc(GL.GL_LEQUAL)  # The Type Of Depth Test To Do
