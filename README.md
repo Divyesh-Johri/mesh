@@ -38,6 +38,8 @@ $ brew install boost
 Installation
 ------------
 
+**NOTE**: You should only follow these directions if you are **NOT** installing Mesh for SOMA.
+
 First, create a dedicated Python virtual environment and activate it:
 
 ```
